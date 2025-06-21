@@ -10,6 +10,7 @@ function brick:init(world, x, y)
 	self.body = love.physics.newBody(world, x + self.width / 2, y + self.height / 2, "static")
 	self.shape = love.physics.newRectangleShape(self.width, self.height)
 	self.fixture = love.physics.newFixture(self.body, self.shape)
+	self.fixture:setFriction(0)
 	self.fixture:setUserData("brick")
 
 	return self

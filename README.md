@@ -23,11 +23,12 @@ Run `love .` in the terminal.
 - General structure
 - Player movement
 - Provisional character skin
+- Coyote time, Jump buffer
+- Throwing
 
 ### TODO
 
 - More blocks
-- Read maps from a file to play in
 - Some kind of score
 - Parallax background
 - Fix collisions
