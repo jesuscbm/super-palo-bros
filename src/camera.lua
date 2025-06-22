@@ -1,4 +1,5 @@
 local cam = { x = 0, y = 0 }
+-- TODO: Parallax
 
 function cam:set(x, y)
 	self.x, self.y = x, y

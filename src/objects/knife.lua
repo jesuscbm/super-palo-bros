@@ -8,6 +8,7 @@ function knife:init(world, x, y)
 
 	self.destroyed = false
 
+	self.name = "knife"
 	self.image = assets.imgs["knife"]
 	self.frame = 0
 	self.n_frames = 8
@@ -28,7 +29,8 @@ function knife:init(world, x, y)
 	self.shape = love.physics.newCircleShape(self.width/2)
 	self.fixture = love.physics.newFixture(self.body, self.shape)
 	self.fixture:setFriction(0)
-	self.fixture:setUserData("knife")
+	self.fixture:setSensor(true)
+	self.fixture:setUserData(self)
 end
 
 function knife:update(dt)

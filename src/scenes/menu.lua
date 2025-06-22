@@ -8,7 +8,7 @@ function menu:load()
 end
 
 function menu:update(_)
-	if love.keyboard.isDown("space") then
+	if love.keyboard.isDown("return") then
 		Game.current = Game.playing
 		Game.current:load()
 	end
@@ -16,7 +16,7 @@ end
 
 function menu:draw()
 	love.graphics.draw(self.title, 800 / 2 - self.title:getWidth() / 2, 0)
-	love.graphics.print("Press Space to start", 350, 500)
+	love.graphics.print("Press Enter to start", 350, 500)
 	love.graphics.setBackgroundColor(0.6, 0.2, 1)
 end
 

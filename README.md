@@ -11,7 +11,7 @@ Meant as a learning project. Art is, unfortunately, original
 
 Needs the [LÖVE](https://love2d.org/) framework.
 
-Map is written in the map.txt file. # indicates a brick block.
+Map is written in the map.txt file. # indicates a brick block. o indicates an enemy. $ indicates the player.
 
 Run `love .` in the terminal.
 
@@ -19,16 +19,18 @@ Run `love .` in the terminal.
 
 ### Done
 
-- Physics initialization
+- Read map from file
 - General structure
-- Player movement
-- Provisional character skin
+- Player movement (walk, run, jump)
 - Coyote time, Jump buffer
-- Throwing
+- Throwing knives
+- Block destruction
+- An enemy
 
 ### TODO
 
 - More blocks
-- Some kind of score
+- Coins ?
 - Parallax background
-- Fix collisions
+- More Enemies ?
+- Particles when destroying blocks

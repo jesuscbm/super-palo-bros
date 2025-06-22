@@ -9,6 +9,8 @@ function player:init(world)
 	self.width = 128
 	self.height = 180
 
+	self.name = "player"
+
 	self.coyoteTime = 0.15
 	self.coyoteTimer = 0
 
@@ -18,13 +20,30 @@ function player:init(world)
 	self.body = love.physics.newBody(world, 200, 180, "dynamic")
 	self.body:setFixedRotation(true)
 	self.shape = love.physics.newRectangleShape(self.width - 20, self.height) -- We make it a bit thinner to have a forgiving hitbox
+	-- Why this shape? Because there are super-small vertical gaps between the blocks and the simplest way to fix this
+	-- is to give the characer slanted feet. This also makes better jumps (when you almost get on a ledge, you autostep it)
+	self.shape = love.physics.newPolygonShape(
+		-self.width / 2 + 10,
+		self.height / 2 - 15,
+		-self.width / 2 + 15,
+		self.height / 2,
+		self.width / 2 - 15,
+		self.height / 2,
+		self.width / 2 - 10,
+		self.height / 2 - 15,
+		self.width / 2 - 10,
+		-self.height / 2,
+		-self.width / 2 + 10,
+		-self.height / 2
+	)
+
 	self.fixture = love.physics.newFixture(self.body, self.shape)
-	self.fixture:setUserData("player")
+	self.fixture:setUserData(self)
 	-- For the feet
 	self.feetShape = love.physics.newRectangleShape(0, self.height / 2, self.width - 40, 10)
 	self.feetFixture = love.physics.newFixture(self.body, self.feetShape)
-	self.feetFixture:setSensor(true) -- Just senses doesn't collide
-	self.feetFixture:setUserData("feet")
+	self.feetFixture:setSensor(true) -- Just senses, doesn't collide
+	self.feetFixture:setUserData({ name = "feet", player = self })
 
 	self.feetContacts = 0
 	self.isGrounded = function()
@@ -35,7 +54,7 @@ function player:init(world)
 	self.headShape = love.physics.newRectangleShape(0, -self.height / 2, self.width - 40, 10)
 	self.headFixture = love.physics.newFixture(self.body, self.headShape)
 	self.headFixture:setSensor(true)
-	self.headFixture:setUserData("head")
+	self.headFixture:setUserData({ name = "head", player = self })
 
 	self.image = assets.imgs["sprite"]
 	self.frames = {
@@ -109,7 +128,8 @@ end
 
 function player:update(dt)
 	local vx, vy = self.body:getLinearVelocity()
-	local speed = 200
+	local speed = 300
+	local fastSpeed = 500
 
 	-- Animations
 	local run = self.frames.run
@@ -129,18 +149,31 @@ function player:update(dt)
 	-- Jump Buffer
 	self.jumpBufferTimer = self.jumpBufferTimer + dt
 	if self.isGrounded() and self.jumpBufferTimer <= self.jumpBufferTime then
-		self.body:applyLinearImpulse(0, -6500)
+		self.body:applyLinearImpulse(0, -5000)
 	end
 
 	-- Keys
-	if love.keyboard.isDown("left") then -- Consider keypressed
+	if love.keyboard.isDown("lshift") then
+		vx = -fastSpeed
+		self.frames.run.duration = 0.1
+	else
 		vx = -speed
+		self.frames.run.duration = 0.2
+	end
+
+	if love.keyboard.isDown("left") then -- Consider keypressed
+		if love.keyboard.isDown("right") then
+			return
+		end
+
 		self.facing = -1
 		if self.state == "idle" then
+			self.frames.run.frame = 0
+			self.frames.run.currentTime = 0
 			self.state = "run"
 		end
 	elseif love.keyboard.isDown("right") then
-		vx = speed
+		vx = vx * -1
 		self.facing = 1
 		if self.state == "idle" then
 			self.frames.run.frame = 0
@@ -165,10 +198,14 @@ function player:update(dt)
 	if love.keyboard.isDown("up") then
 		local _, dy = self.body:getLinearVelocity()
 		if (self.isGrounded() or self.coyoteTimer < self.coyoteTime) and dy >= -20 then
-			self.body:applyLinearImpulse(0, -6500)
+			self.body:applyLinearImpulse(0, -5000)
+		else
+			self.body:applyForce(0, -3000) -- Hold the jump => Higher
 		end
 		self.jumpBufferTimer = 0
 	end
+
+	-- Throw
 	if love.keyboard.isDown("space") then
 		self.throw.timer = self.throw.timer + dt
 		if self.throw.timer > self.throw.maxTimer then

@@ -2,27 +2,83 @@ local p = {}
 local player = Game.current.player
 
 function p.beginContact(a, b, coll)
-	if
-		a:getUserData() == "feet" and b:getUserData() == "brick"
-		or b:getUserData() == "feet" and a:getUserData() == "brick"
-	then
-		player.feetContacts = player.feetContacts + 1
-		if player.isGrounded() then
+	local aData = a:getUserData()
+	local bData = b:getUserData()
+	if aData.name == nil or bData.name == nil then
+		return
+	end
+
+	-- feet-brick collision
+	if aData.name == "feet" and bData.name == "brick" or bData.name == "feet" and aData.name == "brick" then
+		player.feetContacts = player.feetContacts + 1	-- TODO: Not use global
+		if player.isGrounded() and player.state == "jump" then
 			player.state = "idle"
 		end
 	end
 
-	if a:getUserData() == "knife" and b:getUserData() == "brick" then
+	-- knife-brick collision
+	if aData.name == "knife" and bData.name == "brick" then
 		a:getBody():destroy()
-	elseif b:getUserData() == "knife" and a:getUserData() == "brick" then
-                b:getBody():destroy()
+	elseif bData.name == "knife" and aData.name == "brick" then
+		b:getBody():destroy()
+	end
+
+	-- head-brick collision
+	if aData.name == "head" and bData.name == "brick" then
+		bData:destroy()
+	elseif bData.name == "head" and aData.name == "brick" then
+		aData:destroy()
+	end
+
+	-- player-cheese collision
+	if aData.name == "player" and bData.name == "cheese" or bData.name == "player" and aData.name == "cheese" then
+		-- TODO: Win screen
+		print("Victory")
+	end
+
+	-- player-mill collision
+	if aData.name == "player" and bData.name == "mill" or bData.name == "player" and aData.name == "mill" then
+		-- TODO: Death screen
+		print("Dead")
+	end
+
+	if aData.name == "feet" and bData.name == "mill" then
+		bData:destroy() -- TODO: Small invulnerability
+	end
+	if bData.name == "feet" and aData.name == "mill" then
+		aData:destroy()
+	end
+
+	-- mill-knife collision
+	if aData.name == "mill" and bData.name == "knife" then
+		aData:destroy()
+	end
+	if bData.name == "mill" and aData.name == "knife" then
+		bData:destroy()
+	end
+
+	-- mill-wall collision
+	if
+		(aData.name == "brick" or aData.name == "millLeftSide" or aData.name == "millRightSide")
+		and (bData.name == "millLeftSide" or bData.name == "millRightSide")
+	then
+		bData.mill:flip()
+	end
+
+	if
+		(bData.name == "brick" or bData.name == "millLeftSide" or bData.name == "millRightSide")
+		and (aData.name == "millLeftSide" or aData.name == "millRightSide")
+	then
+		aData.mill:flip()
 	end
 end
 
 function p.endContact(a, b, coll)
+    local aData = a:getUserData()
+    local bData = b:getUserData()
 	if
-		a:getUserData() == "feet" and b:getUserData() == "brick"
-		or b:getUserData() == "feet" and a:getUserData() == "brick"
+		aData.name == "feet" and bData.name == "brick"
+		or bData.name == "feet" and aData.name == "brick"
 	then
 		player.feetContacts = player.feetContacts - 1
 		if not player.isGrounded() then
