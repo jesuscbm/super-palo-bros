@@ -1,5 +1,5 @@
 Game = {
-    -- Scenes go here
+    -- Scenes go here. Facilitates navigation
 }
 
 function love.load()
@@ -8,6 +8,8 @@ function love.load()
 
     Game.menu = require("src.scenes.menu")
     Game.playing = require("src.scenes.playing")
+	Game.win = require("src.scenes.win")
+	Game.lose = require("src.scenes.lose")
     Game.current = Game.menu
     Game.current:load()
 end

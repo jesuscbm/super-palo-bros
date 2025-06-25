@@ -6,10 +6,13 @@ local knife = require("src.objects.knife")
 -- TODO: Acceleration?
 function player:init(world)
 	self.facing = 1 -- 1 for right, -1 for left
-	self.width = 128
-	self.height = 180
+	self.width = 86
+	self.height = 120
 
 	self.name = "player"
+
+	self.invulnerabilityTime = 0.2
+	self.invulnerabilityTimer = 0
 
 	self.coyoteTime = 0.15
 	self.coyoteTimer = 0
@@ -127,9 +130,16 @@ function player:draw()
 end
 
 function player:update(dt)
+	local x, y = self.body:getPosition()
 	local vx, vy = self.body:getLinearVelocity()
 	local speed = 300
 	local fastSpeed = 500
+
+	-- Fell down
+	if y > 2000 then -- TODO: Better condition
+		Game.current = Game.lose
+		Game.current:load()
+	end
 
 	-- Animations
 	local run = self.frames.run
@@ -137,6 +147,13 @@ function player:update(dt)
 	if run.currentTime > run.duration then
 		run.currentTime = run.currentTime - run.duration
 		run.frame = (run.frame + 1) % run.n_frames
+	end
+
+	-- Invulnerabiliy after killing
+	if self.invulnerabilityTimer > 0 then
+		self.invulnerabilityTimer = self.invulnerabilityTimer - dt
+	else
+		self.invulnerabilityTimer = 0
 	end
 
 	-- Coyote Time
@@ -191,16 +208,15 @@ function player:update(dt)
 
 	self.body:setLinearVelocity(vx, vy)
 
-	local x, y = self.body:getPosition()
 	if x < self.width / 2 then
 		self.body:setPosition(self.width / 2, y)
 	end
 	if love.keyboard.isDown("up") then
 		local _, dy = self.body:getLinearVelocity()
 		if (self.isGrounded() or self.coyoteTimer < self.coyoteTime) and dy >= -20 then
-			self.body:applyLinearImpulse(0, -5000)
+			self.body:applyLinearImpulse(0, -2500)
 		else
-			self.body:applyForce(0, -3000) -- Hold the jump => Higher
+			self.body:applyForce(0, -800) -- Hold the jump => Higher
 		end
 		self.jumpBufferTimer = 0
 	end

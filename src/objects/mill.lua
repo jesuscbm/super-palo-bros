@@ -75,11 +75,6 @@ function mill:update(dt)
 	self.body:setLinearVelocity(self.orientation * speed, vy)
 end
 
-function mill:destroy()
-	self.destroyed = true
-	self.body:destroy()
-end
-
 function mill:flip() -- used in collision
 	if self.orientationTimer > 0 then
 		return
@@ -87,6 +82,12 @@ function mill:flip() -- used in collision
 
 	self.orientation = -self.orientation
 	self.orientationTimer = self.orientationDuration
+end
+
+function mill:destroy()
+	self.destroyed = true
+	self.body:destroy()
+	self.fixture:destroy()
 end
 
 return mill

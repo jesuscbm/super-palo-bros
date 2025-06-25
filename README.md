@@ -29,8 +29,9 @@ Run `love .` in the terminal.
 
 ### TODO
 
+- Random clouds
+- Fix Mills
 - More blocks
 - Coins ?
-- Parallax background
 - More Enemies ?
 - Particles when destroying blocks

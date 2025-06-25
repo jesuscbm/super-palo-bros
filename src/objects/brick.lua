@@ -31,6 +31,7 @@ end
 function brick:destroy()
         self.destroyed = true
         self.body:destroy()
+	self.fixture:destroy()
 end
 
 return brick

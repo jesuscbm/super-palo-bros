@@ -18,9 +18,9 @@ function p.beginContact(a, b, coll)
 
 	-- knife-brick collision
 	if aData.name == "knife" and bData.name == "brick" then
-		a:getBody():destroy()
+		aData:destroy()
 	elseif bData.name == "knife" and aData.name == "brick" then
-		b:getBody():destroy()
+		bData:destroy()
 	end
 
 	-- head-brick collision
@@ -33,21 +33,30 @@ function p.beginContact(a, b, coll)
 	-- player-cheese collision
 	if aData.name == "player" and bData.name == "cheese" or bData.name == "player" and aData.name == "cheese" then
 		-- TODO: Win screen
-		print("Victory")
+		Game.current = Game.win
+		Game.current:load()
 	end
 
 	-- player-mill collision
-	if aData.name == "player" and bData.name == "mill" or bData.name == "player" and aData.name == "mill" then
-		-- TODO: Death screen
-		print("Dead")
-	end
 
 	if aData.name == "feet" and bData.name == "mill" then
-		bData:destroy() -- TODO: Small invulnerability
+		aData.player.invulnerabilityTimer = aData.player.invulnerabilityTime
+		bData:destroy()
 	end
 	if bData.name == "feet" and aData.name == "mill" then
+		bData.player.invulnerabilityTimer = bData.player.invulnerabilityTime
 		aData:destroy()
 	end
+
+	if aData.name == "player" and bData.name == "mill" or bData.name == "player" and aData.name == "mill" then
+		-- TODO: Death screen
+		if aData.invulnerabilityTimer > 0 then
+			return
+		end
+		Game.current = Game.lose
+		Game.current:load()
+	end
+
 
 	-- mill-knife collision
 	if aData.name == "mill" and bData.name == "knife" then

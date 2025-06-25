@@ -34,8 +34,7 @@ function knife:init(world, x, y)
 end
 
 function knife:update(dt)
-	if self.body:isDestroyed() then
-		self.destroyed = true
+	if self.destroyed then
 		return
 	end
 	self.frameTimer = self.frameTimer + dt
@@ -53,6 +52,12 @@ function knife:draw()
 	love.graphics.draw(self.image, self.quads[self.frame + 1], x - self.width / 2, y - self.height / 2)
 
 	-- love.graphics.circle("line", x, y, self.shape:getRadius())
+end
+
+function knife:destroy()
+	self.destroyed = true
+	self.body:destroy()
+	self.fixture:destroy()
 end
 
 return knife

@@ -1,5 +1,6 @@
 local player = require("src.objects.player")
 local cam = require("src.camera")
+local assets = require("src.assets")
 
 local playing = {
 	-- Obstacles, platforms, player, enemies...
@@ -11,7 +12,7 @@ function playing:load()
 	playing.player = player:new(playing.world)
 	local elements = require("src.loadmap")
 	if elements == nil then
-                return nil	-- TODO: Error
+		return nil -- TODO: Error
 	end
 	playing.bricks = elements.bricks
 	playing.cheese = elements.cheese
@@ -32,34 +33,37 @@ function playing:update(dt)
 		k:update(dt)
 	end
 	for _, m in pairs(playing.mills) do
-                m:update(dt)
-        end
+		m:update(dt)
+	end
 	local x, y = playing.player.body:getPosition()
 	cam:set(x, y)
 end
 
 function playing:draw()
+	local x, y = playing.player.body:getPosition()
 	cam:apply()
 	playing.player:draw()
 	for i, b in ipairs(playing.bricks) do
 		if b.destroyed then
 			table.remove(playing.bricks, i)
 			goto continue
-                end
+		end
 		b:draw()
-	    ::continue::
+		::continue::
 	end
-	for _, m in pairs(playing.mills) do
+	for i, m in pairs(playing.mills) do
 		if m.destroyed then
-                        goto continue
-                end
-                m:draw()
-            ::continue::
-        end	-- TODO: Drawable object they all extend??
+			table.remove(playing.mills, i)
+		end
+		m:draw()
+	end
 	for _, c in pairs(playing.cheese) do
-                c:draw()
-        end
-	for _, k in pairs(playing.knifes) do
+		c:draw()
+	end
+	for i, k in pairs(playing.knifes) do
+		if k.destroyed then
+			table.remove(playing.knifes, i)
+		end
 		k:draw()
 	end
 	cam:clear()
